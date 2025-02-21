@@ -259,13 +259,13 @@ impl Stack {
 /// The virtual machine itself
 pub struct Uxn<'a> {
     /// Device memory
-    dev: [u8; 256],
+    pub dev: [u8; 256],
     /// 64 KiB of VM memory
-    ram: &'a mut [u8; 65536],
+    pub ram: &'a mut [u8; 65536],
     /// 256-byte data stack
-    stack: Stack,
+    pub stack: Stack,
     /// 256-byte return stack
-    ret: Stack,
+    pub ret: Stack,
 
     /// Preferred evaluation backend
     backend: Backend,
@@ -456,7 +456,8 @@ impl<'a> Uxn<'a> {
     #[inline]
     pub fn dev_mut_at<D: Ports>(&mut self, pos: u8) -> &mut D {
         Self::check_dev_size::<D>();
-        D::mut_from_bytes(&mut self.dev[usize::from(pos)..][..DEV_SIZE]).unwrap()
+        D::mut_from_bytes(&mut self.dev[usize::from(pos)..][..DEV_SIZE])
+            .unwrap()
     }
 
     /// Returns a mutable reference to the given [`Ports`] object
@@ -1568,7 +1569,10 @@ pub trait Device {
 
 /// Trait for a type which can be cast to a device ports `struct`
 pub trait Ports:
-    zerocopy::IntoBytes + zerocopy::FromBytes + zerocopy::KnownLayout + zerocopy::Immutable
+    zerocopy::IntoBytes
+    + zerocopy::FromBytes
+    + zerocopy::KnownLayout
+    + zerocopy::Immutable
 {
     /// Base address of the port, of the form `0xA0`
     const BASE: u8;
