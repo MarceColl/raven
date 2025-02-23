@@ -267,6 +267,8 @@ pub struct Uxn<'a> {
     /// 256-byte return stack
     pub ret: Stack,
 
+    pub pc: u16,
+
     /// Preferred evaluation backend
     backend: Backend,
 }
@@ -315,6 +317,7 @@ impl<'a> Uxn<'a> {
             stack: Stack::default(),
             ret: Stack::default(),
             backend,
+            pc: 0,
         }
     }
 
@@ -437,6 +440,12 @@ impl<'a> Uxn<'a> {
             }
         }
         unreachable!()
+    }
+
+    #[inline]
+    pub fn step<D: Device>(&mut self, dev: &mut D, mut pc: u16) -> Option<u16> {
+        let op = self.next(&mut pc);
+        self.op(op, dev, pc)
     }
 
     /// Converts raw ports memory into a [`Ports`] object
